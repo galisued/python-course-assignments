@@ -7,5 +7,5 @@ I used Gemini for building the website prompts:
 3. remove the photo above and put a photo of nano material as a background. also remove the profile picture from the contact details
 
 4. it didn't work. not the background and not the topic of interest boxes
-5. 
+  
 6. i got to here. now how do i make the index.html as the galisued.github.io?
