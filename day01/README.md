@@ -1,4 +1,4 @@
-I uses Gemini for building the website
+I used Gemini for building the website
 prompts: 
 1.this is my readme for my new github website. do you have offers to improve it?
 
