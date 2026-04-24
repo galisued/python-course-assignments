@@ -28,7 +28,7 @@ to calculate the d-spacing of (101) plane of silica:
 * **Enter 2-Theta:** 26.64
 
 **Expected Output:**
-* **Calculated theta:** 13.32
+* **Calculated θ:** 13.32
 * **d-spacing:** 3.3435 Å
 
 i used Gemini to write the code. promt:
