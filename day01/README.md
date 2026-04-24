@@ -2,7 +2,7 @@ I used Gemini for building the website
 
 prompts: 
 
-1.this is my readme for my new github website. do you have offers to improve it?
+1. this is my readme for my new github website. do you have offers to improve it?
 
 2. i want the website to look better. how do i do that?
 
