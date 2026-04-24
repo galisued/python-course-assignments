@@ -31,6 +31,8 @@ to calculate the d-spacing of (101) plane of silica:
 * **Calculated θ:** 13.32
 * **d-spacing:** 3.3435 Å
 
+###AI
+
 i used Gemini to write the code. promt:
 
 I'm taking a course in Python. Can you write me a code that calculate d-spacing using Bragg's law? in the code first ask to enter the wavelength of the Xray and mention it is usually 1.5406 angstrom and then ask to enter the 2theta. dont forget that in the measurment they show 2theta so you need to divide it by two  before the calculation 
