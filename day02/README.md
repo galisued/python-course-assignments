@@ -31,7 +31,7 @@ to calculate the d-spacing of (101) plane of silica:
 * **Calculated θ:** 13.32
 * **d-spacing:** 3.3435 Å
 
-###AI
+### AI
 
 i used Gemini to write the code. promt:
 
