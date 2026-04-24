@@ -1,1 +1,1 @@
-print("cjheck test")
+print("test")
