@@ -18,7 +18,7 @@ The program requires two inputs from the user:
 1. **Wavelength (λ):** This is usually **1.5406 Å** (Angstroms), though it can vary depending on the specific machine.
 2. **Angle (2-Theta):** The raw angle measurement provided by the XRD machine.
 
-**Important Note on the Angle:** The machine outputs a value called "2-Theta" (the total angle of the reflected X-ray). However, the Bragg's Law equation only requires "Theta" (half of that angle). To handle this, the program automatically divides the user's 2-Theta input by 2, calculates the true Theta, and then computes the final d-spacing using the formula above. 
+**Note on the Angle:** The machine outputs a value called "2-Theta" (the total angle of the reflected X-ray). However, the Bragg's Law equation only requires "Theta" (half of that angle). To handle this, the program automatically divides the user's 2-Theta input by 2, calculates the true Theta, and then computes the final d-spacing using the formula above. 
 
 ### Example
 
