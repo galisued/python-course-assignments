@@ -1,6 +1,6 @@
 import sys
 from bragg_module import calculate_d_spacing
-
+# in this code, the angle before the wavelength because wavelength is optional and has a default value, while the angle is required for the calculation. This way, users can easily provide just the angle if they want to use the default wavelength, or both values if they want to specify a different wavelength.
 def main():
     # Check if the user provided at least the 2tpython3 day03/bragg_sys.py 27.5 0.7107heta argument
     if len(sys.argv) < 2 or len(sys.argv) > 3:
