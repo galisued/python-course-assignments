@@ -50,7 +50,7 @@ entry_2theta.pack(pady=10)
 
 # Calculate Button
 calc_btn = ctk.CTkButton(master=frame, text="Calculate d-spacing", command=perform_calculation)
-calc_btn.pack(pady=20)
+calc_btn.pack(pady=20.5)
 
 # Results Display
 result_label = ctk.CTkLabel(master=frame, text="Results will appear here.", font=ctk.CTkFont(size=16))
