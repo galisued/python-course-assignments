@@ -1,22 +1,28 @@
 import sys
 from bragg_module import calculate_d_spacing
-# in this code, the angle before the wavelength because wavelength is optional and has a default value, while the angle is required for the calculation. This way, users can easily provide just the angle if they want to use the default wavelength, or both values if they want to specify a different wavelength.
+
 def main():
-    # Check if the user provided at least the 2tpython3 day03/bragg_sys.py 27.5 0.7107heta argument
+    # Check if the user provided at least the 2theta argument
     if len(sys.argv) < 2 or len(sys.argv) > 3:
         print("Usage: python bragg_sys.py <2theta_angle> [wavelength]")
         print("Example: python bragg_sys.py 27.5")
-        print("Example: python bragg_sys.py 27.5 1.5406")
         sys.exit(1)
     
     try:
+        # Get the inputs
         two_theta = float(sys.argv[1])
-        # Use provided wavelength or default to 1.5406
         wavelength = float(sys.argv[2]) if len(sys.argv) == 3 else 1.5406
         
+        # NEW VALIDATION CHECK: Are the numbers negative or zero?
+        if two_theta <= 0 or wavelength <= 0:
+            print("Error: Both the angle and wavelength must be greater than zero.")
+            sys.exit(1) # Stop the script immediately!
+            
+        # If we made it past the check, do the math
         theta_degrees, d_spacing = calculate_d_spacing(wavelength, two_theta)
         
-        print(f"Calculated θ: {theta_degrees:.4f}°")
+        print("\n--- Results ---")
+        print(f"Calculated θ: {theta_degrees:.2f}°")
         print(f"d-spacing: {d_spacing:.4f} Å")
         
     except ValueError:

@@ -14,22 +14,27 @@ def perform_calculation():
         # Get and parse 2theta
         two_theta = float(entry_2theta.get())
         
+        # NEW VALIDATION CHECK: Are the numbers negative or zero?
+        if wavelength <= 0 or two_theta <= 0:
+            result_label.configure(text="Error: Values must be greater than zero. Try again.", text_color="red")
+            return # This stops the function right here so it doesn't do the math!
+        
         # Call shared library
         theta_degrees, d_spacing = calculate_d_spacing(wavelength, two_theta)
         
-        # Update UI with success (Green text)
-        result_text = f"Calculated θ: {theta_degrees:.4f}°\nResult d-spacing: {d_spacing:.4f} Å"
-        result_label.configure(text=result_text, text_color="#2FA572")
+        # Update UI with success
+        result_text = f"Calculated θ: {theta_degrees:.2f}°\nResult d-spacing: {d_spacing:.4f} Å"
+        result_label.configure(text=result_text, text_color="green")
         
     except ValueError:
-        # Update UI with error (Red text)
-        result_label.configure(text="Error: Please enter valid numbers.", text_color="#EF4444")
+        # Update UI with error
+        result_label.configure(text="Error: Please enter valid numbers. Try again.", text_color="red")
 
 # Setup main window
 root = ctk.CTk()
 root.title("Bragg's Law Calculator")
 root.geometry("350x350")
-root.resizable(False, False) # Prevents the window from being resized
+root.resizable(True, True) # Allows the window to be resized
 
 # Create a padded frame inside the window
 frame = ctk.CTkFrame(master=root)
