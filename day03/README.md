@@ -1,5 +1,24 @@
 
-### AI
+# Day 03 Assignment: Bragg's Law Modularization
+
+## Overview
+This project takes a procedural Python script from Day 2 and refactors it into a modular architecture. The core business logic (Bragg's Law calculation) has been isolated into a shared library, which is then utilized by three distinct user interfaces.
+
+## Project Structure
+* **`bragg_module.py`**: The core library containing the mathematical logic (`calculate_d_spacing`).
+* **`bragg_input.py`**: A standard terminal script using Python's built-in `input()` function.
+* **`bragg_sys.py`**: A command-line tool that takes arguments directly via `sys.argv`.
+* **`bragg_gui.py`**: A graphical user interface built with the `tkinter` library.
+* **`bragg_test.py`**: A test suite using Python's built-in `unittest` framework.
+
+## external library
+
+This project utilizes the following external libraries, which must be installed via pip:
+
+* **`customtkinter`**: Used to upgrade the standard `tkinter` Graphical User Interface into a modern, dark-mode compatible desktop window.
+* **`pytest`**: Used as the testing framework to verify the mathematical logic and handle expected exceptions (like `ZeroDivisionError`).
+
+## AI
 
 i used Gemini to write the code. prompts:
 
