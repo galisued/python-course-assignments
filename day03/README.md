@@ -18,6 +18,12 @@ This project utilizes the following external libraries, which must be installed 
 * **`customtkinter`**: Used to upgrade the standard `tkinter` Graphical User Interface into a modern, dark-mode compatible desktop window.
 * **`pytest`**: Used as the testing framework to verify the mathematical logic and handle expected exceptions (like `ZeroDivisionError`).
 
+**Test Cases & Results:**
+* wavelength 1.5406, angle 26.64 ➔ **Calculated d-spacing: 3.3435 Å** (θ = 13.32°)
+* wavelength 1.5406, angle 44.67 ➔ **Calculated d-spacing: 2.0270 Å** (θ = 22.335°)
+* wavelength 1.7890, angle 52.38 ➔ **Calculated d-spacing: 2.0267 Å** (θ = 26.19°)
+* Invalid input (Angle = 0) ➔ **Returns ZeroDivisionError**
+
 ## AI
 
 i used Gemini to write the code. prompts:
@@ -45,3 +51,4 @@ the test cases I want are:
 - wavelenth 1.5406, angle 44.67
 - wavelenth 1.7890, angle 52.38
 - mabye another with 0/minus which is invalid
+
