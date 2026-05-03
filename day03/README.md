@@ -11,18 +11,18 @@ This project takes a procedural Python script from Day 2 and refactors it into a
 * **`bragg_gui.py`**: A graphical user interface built with the `tkinter` library.
 * **`bragg_test.py`**: A test suite using Python's built-in `unittest` framework.
 
+**Test Cases & Results:**
+* wavelength 1.5406, angle 26.64 ➔ **Calculated d-spacing: 3.3435 Å** (θ = 13.32°)
+* wavelength 1.5406, angle 44.67 ➔ **Calculated d-spacing: 2.0270 Å** (θ = 22.335°)
+* wavelength 1.7890, angle 52.38 ➔ **Calculated d-spacing: 2.0267 Å** (θ = 26.19°)
+* Invalid input (Angle = 0) ➔ **Returns ZeroDivisionError**
+
 ## external library
 
 This project utilizes the following external libraries, which must be installed via pip:
 
 * **`customtkinter`**: Used to upgrade the standard `tkinter` Graphical User Interface into a modern, dark-mode compatible desktop window.
 * **`pytest`**: Used as the testing framework to verify the mathematical logic and handle expected exceptions (like `ZeroDivisionError`).
-
-**Test Cases & Results:**
-* wavelength 1.5406, angle 26.64 ➔ **Calculated d-spacing: 3.3435 Å** (θ = 13.32°)
-* wavelength 1.5406, angle 44.67 ➔ **Calculated d-spacing: 2.0270 Å** (θ = 22.335°)
-* wavelength 1.7890, angle 52.38 ➔ **Calculated d-spacing: 2.0267 Å** (θ = 26.19°)
-* Invalid input (Angle = 0) ➔ **Returns ZeroDivisionError**
 
 ## AI
 
