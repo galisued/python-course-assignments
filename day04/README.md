@@ -31,4 +31,8 @@ The test suite (`bragg_test.py`) was entirely overhauled to test real-world mate
 * **Zero Angle Validation:** Still ensuring `ZeroDivisionError` is caught properly.
 
 ## AI Usage
-I used Gemini to help fix an assertion error in my unit tests. My function mathematically calculated the Silicon $d$-spacing to `3.1358` Å, but I had initially set my test to expect `3.1355` Å based on theoretical models. Gemini helped me realize that using the rounded input angle of $28.44^{\circ}$ meant the true mathematical output was `3.1358`, allowing me to correctly calibrate both the $d$-spacing and subsequent lattice parameter assertions for the Silicon test case.
+I used Gemini for the assignment:
+
+- can you add to each code a calculation for lattice parameter for cubic structure? the input should be h,k,l and the d spacing is the one calculated before. i attached my repository so you can see the code for each app
+
+- can you create a new test file that check also the lattice parameter? plus one with invalid value
