@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 import glob
+from pathlib import Path
 
 def calculate_diameters(image_path, pixel_to_nm_ratio=1.0):
     """
@@ -55,50 +56,42 @@ def calculate_diameters(image_path, pixel_to_nm_ratio=1.0):
     return diameters
 
 if __name__ == "__main__":
-    # --- SETUP & PATH FINDING ---
-    # Get the exact path to where this script is running
-    script_dir = os.path.dirname(os.path.abspath(__file__)) 
-    image_folder = os.path.join(script_dir, "silica images")
+    # Use pathlib to find the "silica images" folder right next to this script
+    # This matches the Path(__file__) logic taught in class!
+    current_dir = Path(__file__).parent
+    image_folder = current_dir / "silica images"
     
-    if not os.path.exists(image_folder):
-        print(f"Error: Could not find the folder at '{image_folder}'")
-        print("Make sure you created the 'silica images' folder.")
-        exit()
+    # Grab all .tiff files in that folder
+    image_files = list(image_folder.glob("*.tiff"))
 
-    search_pattern = os.path.join(image_folder, "*.tiff")
-    image_files = glob.glob(search_pattern)
-
-    if len(image_files) == 0:
+    if not image_files:
         print("No TIFF images found in the 'silica images' folder.")
         exit()
 
     print(f"Found {len(image_files)} images in the folder.")
     print("-" * 40)
 
-
-   # --- BATCH PROCESSING ---
+    # --- BATCH PROCESSING ---
     true_conversion_rate = 0.439
     
     for img_path in image_files:
-        file_name = os.path.basename(img_path) 
+        # Convert the Path object back to a string for OpenCV
+        img_path_str = str(img_path)
+        file_name = img_path.name 
         
-        # RESTORED: This prints the name of the picture before analyzing
         print(f"\nAnalyzing: {file_name}") 
         
         try:
-            results = calculate_diameters(img_path, true_conversion_rate)
+            results = calculate_diameters(img_path_str, true_conversion_rate)
             
             if len(results) > 0:
                 print(f"  Detected {len(results)} nanoparticles.")
                 average = sum(results) / len(results)
                 
-                # NEW: Calculate and print Standard Deviation using NumPy
                 if len(results) > 1:
-                    # ddof=1 calculates the "sample" standard deviation, standard for lab work
                     std_dev = np.std(results, ddof=1) 
                     print(f"  Average Diameter: {average:.2f} ± {std_dev:.2f} nm")
                 else:
-                    # If it only finds 1 particle, there is no deviation
                     print(f"  Diameter: {average:.2f} nm")
                     
             else:
