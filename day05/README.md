@@ -8,7 +8,6 @@ Because these synthesized particles feature a complex dendritic (starburst) pore
 ## Calibration
 The script relies on a scientifically verified calibration ratio for the high-resolution `.tiff` files:
 **1 pixel = 0.439 nm**
-*(This was calculated by anchoring the high-resolution pixel sizes to a known 625 nm ± 6.8 DLS wet-measurement standard for batch 03C3_02b, accounting for the expected shrinkage due to hydration layer loss in the TEM vacuum).*
 
 ## How to Run
 1. Ensure all dependencies are installed:
