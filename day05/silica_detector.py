@@ -75,31 +75,15 @@ if __name__ == "__main__":
     print(f"Found {len(image_files)} images in the folder.")
     print("-" * 40)
 
-    # --- CALIBRATION ---
-    # We know DMSN03C3_02b has a real diameter of ~625 nm.
-    # We will find it in the folder to calculate our conversion rate.
-    true_conversion_rate = 1.0 # Default fallback
-    calibration_file = next((f for f in image_files if "02b" in f), None)
 
-    if calibration_file:
-        print("Calibrating pixel-to-nm ratio using standard (625 nm)...")
-        pixel_results = calculate_diameters(calibration_file, pixel_to_nm_ratio=1.0)
-        
-        if len(pixel_results) > 0:
-            # THE FIX: Grab the absolute LARGEST circle found in the image.
-            # This guarantees we calibrate using the main silica sphere, not a noise artifact.
-            detected_pixel_diameter = max(pixel_results)
-            
-            true_conversion_rate = 625 / detected_pixel_diameter
-            print(f"Calibration successful: 1 pixel = {true_conversion_rate:.3f} nm")
-        else:
-            print("Failed to detect calibration particle. Using 1:1 pixel ratio.")
-    print("-" * 40)
-
-    # --- BATCH PROCESSING ---
+   # --- BATCH PROCESSING ---
+    true_conversion_rate = 0.439
+    
     for img_path in image_files:
         file_name = os.path.basename(img_path) 
-        print(f"\nAnalyzing: {file_name}")
+        
+        # RESTORED: This prints the name of the picture before analyzing
+        print(f"\nAnalyzing: {file_name}") 
         
         try:
             results = calculate_diameters(img_path, true_conversion_rate)
@@ -107,7 +91,16 @@ if __name__ == "__main__":
             if len(results) > 0:
                 print(f"  Detected {len(results)} nanoparticles.")
                 average = sum(results) / len(results)
-                print(f"  Average Diameter: {average:.2f} nm")
+                
+                # NEW: Calculate and print Standard Deviation using NumPy
+                if len(results) > 1:
+                    # ddof=1 calculates the "sample" standard deviation, standard for lab work
+                    std_dev = np.std(results, ddof=1) 
+                    print(f"  Average Diameter: {average:.2f} ± {std_dev:.2f} nm")
+                else:
+                    # If it only finds 1 particle, there is no deviation
+                    print(f"  Diameter: {average:.2f} nm")
+                    
             else:
                 print("  No particles detected. (Adjust Hough Circle parameters).")
                 
