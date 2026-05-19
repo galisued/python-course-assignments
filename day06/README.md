@@ -1,7 +1,4 @@
-```markdown
 # PV Material Screener (Day 6 Assignment)
-
-This repository contains a Python script (`material_filter_PV.py`) developed for the Day 6 assignment of the WIS Python Course.
 
 ## Project Overview
 This script is designed to discover potential material candidates for photovoltaics or photocatalysis. It queries the web-based Materials Project database for specific elemental compounds (by default, Titanium and Oxygen). The script then processes the data by:
