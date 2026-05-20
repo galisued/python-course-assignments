@@ -1,4 +1,4 @@
-# PV Material Screener (Day 6 Assignment)
+# Day 6 Assignment: PV Material Screener
 
 ## Project Overview
 This script is designed to discover potential material candidates for photovoltaics or photocatalysis. It queries the web-based Materials Project database for specific elemental compounds (by default, Titanium and Oxygen). The script then processes the data by:
@@ -17,3 +17,8 @@ This script is designed to discover potential material candidates for photovolta
 2. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
+
+## AI Usage
+I used Gemini for the assignment:
+
+- can you write me a code that will download data from the materials project database? write a program that will search for the best materials for photovoltaic cells by filtering the formation energy and size of band gap, make a plot of all the materials - band gap vs. formation energy. use the tool we learnd in class (day06).
