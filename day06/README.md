@@ -17,7 +17,7 @@ This script is designed to discover potential material candidates for photovolta
 2. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
-3.Run the script using your Materials Project API key (python/python3 material_filter_PV.py --api-key YOUR_API_KEY)
+3. Run the script using your Materials Project API key (python/python3 material_filter_PV.py --api-key YOUR_API_KEY)
 
 ## AI Usage
 I used Gemini for the assignment:
