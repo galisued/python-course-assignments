@@ -51,43 +51,44 @@ if st.sidebar.button("Search Candidates"):
                     else:
                         st.success(f"Successfully found {len(candidates)} promising candidates!")
                         
-                        # Layout with columns for a clean dashboard look
-                        col1, col2 = st.columns([1, 2])
+                        # --- REMOVED COLUMN LAYOUT --- 
                         
-                        with col1:
-                            st.subheader("Top Candidates Data")
-                            # Display the dataframe cleanly
-                            st.dataframe(
-                                candidates[['Formula', 'Band_Gap_eV', 'Formation_Energy', 'Energy_Above_Hull']],
-                                use_container_width=True,
-                                hide_index=True
-                            )
+                        # 1. Show the table first
+                        st.subheader("Top Candidates Data")
+                        # By passing 'candidates' directly, it shows all columns from the database
+                        st.dataframe(
+                            candidates, 
+                            use_container_width=True,
+                            hide_index=True
+                        )
+                        
+                        # Add a visual divider line
+                        st.divider() 
                             
-                        with col2:
-                            st.subheader("Stability vs. Band Gap")
-                            
-                            # 3. Create the Matplotlib plot
-                            fig, ax = plt.subplots(figsize=(8, 6))
-                            scatter = ax.scatter(
-                                candidates['Band_Gap_eV'], 
-                                candidates['Formation_Energy'], 
-                                c=candidates['Energy_Above_Hull'],
-                                cmap='viridis', 
-                                alpha=0.8, 
-                                edgecolors='w', 
-                                s=100
-                            )
-                            
-                            cbar = fig.colorbar(scatter, ax=ax)
-                            cbar.set_label('Energy Above Hull (eV/atom)')
-                            
-                            ax.set_title(f"Material Screener: {'-'.join(elements)} Compounds")
-                            ax.set_xlabel('Band Gap (eV)')
-                            ax.set_ylabel('Formation Energy (eV/atom)')
-                            ax.grid(True, linestyle='--', alpha=0.6)
-                            
-                            # Pass the figure directly into Streamlit
-                            st.pyplot(fig)
+                        # 2. Show the graph underneath
+                        st.subheader("Stability vs. Band Gap")
+                        
+                        # Made the graph slightly wider (10, 6) since it now spans the whole page
+                        fig, ax = plt.subplots(figsize=(10, 6)) 
+                        scatter = ax.scatter(
+                            candidates['Band_Gap_eV'], 
+                            candidates['Formation_Energy'], 
+                            c=candidates['Energy_Above_Hull'],
+                            cmap='viridis', 
+                            alpha=0.8, 
+                            edgecolors='w', 
+                            s=100
+                        )
+                        
+                        cbar = fig.colorbar(scatter, ax=ax)
+                        cbar.set_label('Energy Above Hull (eV/atom)')
+                        
+                        ax.set_title(f"Material Screener: {'-'.join(elements)} Compounds")
+                        ax.set_xlabel('Band Gap (eV)')
+                        ax.set_ylabel('Formation Energy (eV/atom)')
+                        ax.grid(True, linestyle='--', alpha=0.6)
+                        
+                        st.pyplot(fig)
                             
             except Exception as e:
                 st.error(f"An error occurred: {e}")
