@@ -11,7 +11,7 @@ st.set_page_config(page_title="PV Material Screener", page_icon="☀️", layout
 st.title("☀️ Photovoltaic Material Screener")
 st.markdown("""
 This tool queries the Materials Project database to discover stable material candidates 
-for photovoltaics or photocatalysis based on user-defined elements and band gap constraints.
+for photovoltaics or photocatalysis based on user-defined elements, band gap constraints, and composition size.
 """)
 
 # --- Sidebar Controls ---
@@ -23,6 +23,16 @@ api_key = st.sidebar.text_input("Materials Project API Key", type="password")
 # Get elements as a comma-separated string, then convert to a list
 elements_str = st.sidebar.text_input("Elements (comma separated)", value="Ti, O")
 elements = [e.strip() for e in elements_str.split(",") if e.strip()]
+
+# --- NEW: Number of elements selector ---
+num_elements_option = st.sidebar.selectbox(
+    "Exact Number of Elements", 
+    options=["Any", 1, 2, 3, 4, 5, 6, 7],
+    index=0,
+    help="Select 'Any' to ignore this filter, or choose a specific number (e.g., 2 for binaries like TiO2, 3 for ternaries like SrTiO3)."
+)
+# Convert the choice into a Python None or Integer before passing to the logic
+num_elements = None if num_elements_option == "Any" else int(num_elements_option)
 
 min_bg = st.sidebar.number_input("Min Band Gap (eV)", value=1.5, step=0.1)
 max_bg = st.sidebar.number_input("Max Band Gap (eV)", value=3.0, step=0.1)
@@ -44,31 +54,26 @@ if st.sidebar.button("Search Candidates"):
                     st.warning("No materials found containing those elements.")
                 else:
                     # 2. Filter data using your tested business logic
-                    candidates = filter_solar_candidates(raw_df, min_bg, max_bg)
+                    # NEW: We now pass the num_elements variable to the function
+                    candidates = filter_solar_candidates(raw_df, min_bg, max_bg, num_elements)
                     
                     if candidates.empty:
-                        st.warning("No thermodynamically stable candidates found within that band gap range.")
+                        st.warning("No thermodynamically stable candidates found matching those exact parameters.")
                     else:
                         st.success(f"Successfully found {len(candidates)} promising candidates!")
                         
-                        # --- REMOVED COLUMN LAYOUT --- 
-                        
                         # 1. Show the table first
                         st.subheader("Top Candidates Data")
-                        # By passing 'candidates' directly, it shows all columns from the database
                         st.dataframe(
                             candidates, 
                             use_container_width=True,
                             hide_index=True
                         )
                         
-                        # Add a visual divider line
                         st.divider() 
                             
                         # 2. Show the graph underneath
                         st.subheader("Stability vs. Band Gap")
-                        
-                        # Made the graph slightly wider (10, 6) since it now spans the whole page
                         fig, ax = plt.subplots(figsize=(10, 6)) 
                         scatter = ax.scatter(
                             candidates['Band_Gap_eV'], 
