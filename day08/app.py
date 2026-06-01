@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 # Import your existing, tested business logic!
 from material_filter_PV import fetch_materials_data, filter_solar_candidates
@@ -17,52 +17,51 @@ for photovoltaics or photocatalysis based on user-defined elements, band gap con
 # --- Sidebar Controls ---
 st.sidebar.header("Search Parameters")
 
-# It's good practice to hide API keys in web apps!
 api_key = st.sidebar.text_input("Materials Project API Key", type="password")
 
-# Get elements as a comma-separated string, then convert to a list
 elements_str = st.sidebar.text_input("Elements (comma separated)", value="Ti, O")
 elements = [e.strip() for e in elements_str.split(",") if e.strip()]
 
-# --- NEW: Number of elements selector ---
 num_elements_option = st.sidebar.selectbox(
     "Exact Number of Elements", 
     options=["Any", 1, 2, 3, 4, 5, 6, 7],
     index=0,
-    help="Select 'Any' to ignore this filter, or choose a specific number (e.g., 2 for binaries like TiO2, 3 for ternaries like SrTiO3)."
+    help="Select 'Any' to ignore this filter, or choose a specific number."
 )
-# Convert the choice into a Python None or Integer before passing to the logic
 num_elements = None if num_elements_option == "Any" else int(num_elements_option)
 
 min_bg = st.sidebar.number_input("Min Band Gap (eV)", value=1.5, step=0.1)
 max_bg = st.sidebar.number_input("Max Band Gap (eV)", value=3.0, step=0.1)
 
 # --- Main App Logic ---
-if st.sidebar.button("Search Candidates"):
+if st.sidebar.button("Search Candidates", type="primary"):
     if not api_key:
         st.sidebar.error("Please provide an API key to continue.")
     elif not elements:
         st.sidebar.error("Please provide at least one element.")
     else:
-        # Use a spinner to show the app is working while waiting for the API
         with st.spinner(f"Querying Materials Project for {', '.join(elements)}..."):
             try:
-                # 1. Fetch raw data using your business logic
                 raw_df = fetch_materials_data(api_key, elements)
                 
                 if raw_df.empty:
                     st.warning("No materials found containing those elements.")
                 else:
-                    # 2. Filter data using your tested business logic
-                    # NEW: We now pass the num_elements variable to the function
                     candidates = filter_solar_candidates(raw_df, min_bg, max_bg, num_elements)
                     
                     if candidates.empty:
                         st.warning("No thermodynamically stable candidates found matching those exact parameters.")
                     else:
-                        st.success(f"Successfully found {len(candidates)} promising candidates!")
+                        candidates = candidates.round({
+                            'Band_Gap_eV': 3,
+                            'Formation_Energy': 3,
+                            'Energy_Above_Hull': 3
+                        })
                         
-                        # 1. Show the table first
+                        st.metric(label="Promising Candidates Found", value=len(candidates))
+                        st.divider()
+                        
+                        # 1. Data Table
                         st.subheader("Top Candidates Data")
                         st.dataframe(
                             candidates, 
@@ -70,30 +69,28 @@ if st.sidebar.button("Search Candidates"):
                             hide_index=True
                         )
                         
-                        st.divider() 
-                            
-                        # 2. Show the graph underneath
+                        st.divider()
+                        
+                        # 2. Interactive Graph
                         st.subheader("Stability vs. Band Gap")
-                        fig, ax = plt.subplots(figsize=(10, 6)) 
-                        scatter = ax.scatter(
-                            candidates['Band_Gap_eV'], 
-                            candidates['Formation_Energy'], 
-                            c=candidates['Energy_Above_Hull'],
-                            cmap='viridis', 
-                            alpha=0.8, 
-                            edgecolors='w', 
-                            s=100
+                        fig = px.scatter(
+                            candidates,
+                            x='Band_Gap_eV',
+                            y='Formation_Energy',
+                            color='Energy_Above_Hull',
+                            hover_data=['Formula'], 
+                            labels={
+                                'Band_Gap_eV': 'Band Gap (eV)',
+                                'Formation_Energy': 'Formation Energy (eV/atom)',
+                                'Energy_Above_Hull': 'Energy Above Hull'
+                            },
+                            color_continuous_scale='Viridis',
+                            title=f"Stability vs. Band Gap for {'-'.join(elements)}"
                         )
                         
-                        cbar = fig.colorbar(scatter, ax=ax)
-                        cbar.set_label('Energy Above Hull (eV/atom)')
+                        fig.update_traces(marker=dict(size=10, line=dict(width=1, color='DarkSlateGrey')))
                         
-                        ax.set_title(f"Material Screener: {'-'.join(elements)} Compounds")
-                        ax.set_xlabel('Band Gap (eV)')
-                        ax.set_ylabel('Formation Energy (eV/atom)')
-                        ax.grid(True, linestyle='--', alpha=0.6)
-                        
-                        st.pyplot(fig)
+                        st.plotly_chart(fig, use_container_width=True)
                             
             except Exception as e:
                 st.error(f"An error occurred: {e}")
