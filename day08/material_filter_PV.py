@@ -24,12 +24,6 @@ def parse_args() -> argparse.Namespace:
         help="Elements to search for separated by spaces (default: Ti O)",
     )
     parser.add_argument(
-        "--num-elements",
-        type=int,
-        default=None,
-        help="Exact number of elements in the material (e.g. 2 for binary, 3 for ternary). If omitted, any number is allowed.",
-    )
-    parser.add_argument(
         "--min-bg",
         type=float,
         default=1.5,
@@ -56,8 +50,7 @@ def fetch_materials_data(api_key: str, elements: list[str]) -> pd.DataFrame:
         with MPRester(api_key) as mpr:
             results = mpr.materials.summary.search(
                 elements=elements,
-                # NEW: Added "nelements" to the requested fields
-                fields=["material_id", "formula_pretty", "band_gap", "formation_energy_per_atom", "energy_above_hull", "nelements"]
+                fields=["material_id", "formula_pretty", "band_gap", "formation_energy_per_atom", "energy_above_hull"]
             )
     except Exception as exc:
         print(f"API Error: {exc}", file=sys.stderr)
@@ -72,28 +65,22 @@ def fetch_materials_data(api_key: str, elements: list[str]) -> pd.DataFrame:
             "Formula": doc.formula_pretty,
             "Band_Gap_eV": doc.band_gap,
             "Formation_Energy": doc.formation_energy_per_atom,
-            "Energy_Above_Hull": doc.energy_above_hull,
-            "Num_Elements": doc.nelements # NEW: Extracting the number of elements
+            "Energy_Above_Hull": doc.energy_above_hull
         }
         for doc in results
     ]
     return pd.DataFrame(data)
 
 
-# NEW: Added num_elements parameter to the business logic
-def filter_solar_candidates(df: pd.DataFrame, min_bg: float, max_bg: float, num_elements: int | None = None) -> pd.DataFrame:
-    """Filter the dataframe for thermodynamic stability, target band gap, and composition size."""
-    print("Filtering for thermodynamically stable candidates within the target parameters...")
+def filter_solar_candidates(df: pd.DataFrame, min_bg: float, max_bg: float) -> pd.DataFrame:
+    """Filter the dataframe for thermodynamic stability and target band gap."""
+    print("Filtering for thermodynamically stable candidates within the target band gap...")
     
     # Must be thermodynamically stable (Formation Energy < 0, Energy Above Hull near 0)
     stable_df = df[(df['Formation_Energy'] < 0) & (df['Energy_Above_Hull'] <= 0.05)]
     
     # Apply user-defined band gap limits
     candidates = stable_df[(stable_df['Band_Gap_eV'] >= min_bg) & (stable_df['Band_Gap_eV'] <= max_bg)]
-    
-    # NEW: Apply the number of elements filter if the user selected one
-    if num_elements is not None and num_elements > 0:
-        candidates = candidates[candidates['Num_Elements'] == num_elements]
     
     # Sort so the most stable are at the top
     return candidates.sort_values(by="Formation_Energy")
@@ -118,6 +105,7 @@ def plot_candidates(candidates: pd.DataFrame, elements: list[str], output: str |
     plt.ylabel('Formation Energy (eV/atom)', fontsize=12)
     plt.grid(True, linestyle='--', alpha=0.6)
 
+    # 4. Output
     if output:
         output_path = Path(output)
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -130,19 +118,21 @@ def plot_candidates(candidates: pd.DataFrame, elements: list[str], output: str |
 def main() -> None:
     args = parse_args()
 
+    # 1. Fetch
     df = fetch_materials_data(args.api_key, args.elements)
     if df.empty:
         print("No materials found.")
         return
 
-    # Pass the new argument into the filter function
-    candidates = filter_solar_candidates(df, args.min_bg, args.max_bg, args.num_elements)
+    # 2. Process
+    candidates = filter_solar_candidates(df, args.min_bg, args.max_bg)
     
     print(f"\nFound {len(candidates)} promising candidates!")
     if not candidates.empty:
         print("Top 5 candidates:")
-        print(candidates[['Formula', 'Band_Gap_eV', 'Formation_Energy', 'Num_Elements']].head())
+        print(candidates[['Formula', 'Band_Gap_eV', 'Formation_Energy']].head())
 
+    # 3. Visualize and Output
     plot_candidates(candidates, args.elements, args.output)
 
 

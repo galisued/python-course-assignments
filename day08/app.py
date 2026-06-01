@@ -2,38 +2,26 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Import your existing, tested business logic!
+# Importing your ORIGINAL, untouched business logic!
 from material_filter_PV import fetch_materials_data, filter_solar_candidates
 
-# --- Page Setup ---
 st.set_page_config(page_title="PV Material Screener", page_icon="☀️", layout="wide")
 
 st.title("☀️ Photovoltaic Material Screener")
 st.markdown("""
 This tool queries the Materials Project database to discover stable material candidates 
-for photovoltaics or photocatalysis based on user-defined elements, band gap constraints, and composition size.
+for photovoltaics or photocatalysis based on user-defined elements and band gap constraints.
 """)
 
-# --- Sidebar Controls ---
 st.sidebar.header("Search Parameters")
-
 api_key = st.sidebar.text_input("Materials Project API Key", type="password")
 
 elements_str = st.sidebar.text_input("Elements (comma separated)", value="Ti, O")
 elements = [e.strip() for e in elements_str.split(",") if e.strip()]
 
-num_elements_option = st.sidebar.selectbox(
-    "Exact Number of Elements", 
-    options=["Any", 1, 2, 3, 4, 5, 6, 7],
-    index=0,
-    help="Select 'Any' to ignore this filter, or choose a specific number."
-)
-num_elements = None if num_elements_option == "Any" else int(num_elements_option)
-
 min_bg = st.sidebar.number_input("Min Band Gap (eV)", value=1.5, step=0.1)
 max_bg = st.sidebar.number_input("Max Band Gap (eV)", value=3.0, step=0.1)
 
-# --- Main App Logic ---
 if st.sidebar.button("Search Candidates", type="primary"):
     if not api_key:
         st.sidebar.error("Please provide an API key to continue.")
@@ -47,10 +35,11 @@ if st.sidebar.button("Search Candidates", type="primary"):
                 if raw_df.empty:
                     st.warning("No materials found containing those elements.")
                 else:
-                    candidates = filter_solar_candidates(raw_df, min_bg, max_bg, num_elements)
+                    # Using the ORIGINAL 3 arguments
+                    candidates = filter_solar_candidates(raw_df, min_bg, max_bg)
                     
                     if candidates.empty:
-                        st.warning("No thermodynamically stable candidates found matching those exact parameters.")
+                        st.warning("No thermodynamically stable candidates found within that band gap range.")
                     else:
                         candidates = candidates.round({
                             'Band_Gap_eV': 3,
@@ -61,7 +50,6 @@ if st.sidebar.button("Search Candidates", type="primary"):
                         st.metric(label="Promising Candidates Found", value=len(candidates))
                         st.divider()
                         
-                        # 1. Data Table
                         st.subheader("Top Candidates Data")
                         st.dataframe(
                             candidates, 
@@ -71,7 +59,6 @@ if st.sidebar.button("Search Candidates", type="primary"):
                         
                         st.divider()
                         
-                        # 2. Interactive Graph
                         st.subheader("Stability vs. Band Gap")
                         fig = px.scatter(
                             candidates,
