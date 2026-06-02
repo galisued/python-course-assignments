@@ -18,7 +18,7 @@ By migrating from a static terminal output to a modern web interface, the tool n
    ```
 3. Start the local web server:
    ```bash
-   streamlit run app.py
+   streamlit run day08/app.py
    ```
 4. The application will automatically open in your default web browser.
 
@@ -31,7 +31,6 @@ This project utilizes pytest to verify both the scientific math and the web inte
 
 Run the full test suite with:
 ```Bash
-cd day08
 pytest
 ```
 ## AI Usage
