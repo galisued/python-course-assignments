@@ -31,7 +31,7 @@ This project utilizes pytest to verify both the scientific math and the web inte
 
 Run the full test suite with:
 ```Bash
-pytest
+pytest day08/test_app.py
 ```
 ## AI Usage
 I used Gemini for the assignment:
