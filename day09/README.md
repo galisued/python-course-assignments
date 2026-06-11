@@ -35,6 +35,12 @@ python predict_solar.py`
 **3. Expected Output**
 The script will load and merge the datasets on their timestamps, train the machine learning model, and output the Mean Absolute Error (MAE) and R-squared values to show overall accuracy. It will then automatically select a sample array of weather conditions from the test data and display both its real recorded power output and the model's predicted power output.
 
+**4. Run Tests**
+you can run the tests by running this command in your terminal:
+```bash
+pytest test_predict_solar.py -v
+```
+
 ## AI Usage
 I used Gemini for the assignment:
 

@@ -7,6 +7,36 @@ import warnings
 # Suppress warnings for cleaner terminal output
 warnings.filterwarnings('ignore')
 
+def process_data(gen_file_path, weather_file_path):
+    """Loads CSV files, formats datetimes, and merges the datasets."""
+    gen_df = pd.read_csv(gen_file_path)
+    weather_df = pd.read_csv(weather_file_path)
+
+    gen_df['DATE_TIME'] = pd.to_datetime(gen_df['DATE_TIME'])
+    weather_df['DATE_TIME'] = pd.to_datetime(weather_df['DATE_TIME'])
+
+    df = pd.merge(gen_df, weather_df, on='DATE_TIME', how='inner')
+    return df
+
+def train_model(df):
+    """Splits data and trains the Random Forest model."""
+    X = df[['AMBIENT_TEMPERATURE', 'MODULE_TEMPERATURE', 'IRRADIATION']]
+    y = df['DC_POWER']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+    model.fit(X_train, y_train)
+
+    return model, X_test, y_test
+
+def evaluate_model(model, X_test, y_test):
+    """Calculates accuracy metrics based on test data."""
+    predictions = model.predict(X_test)
+    mae = mean_absolute_error(y_test, predictions)
+    r2 = r2_score(y_test, predictions)
+    return mae, r2
+
 def main():
     print("==================================================")
     print("      SOLAR POWER DC YIELD PREDICTIVE MODEL       ")
@@ -14,37 +44,18 @@ def main():
     
     print("Loading weather and generation datasets...")
     try:
-        # Load the real datasets downloaded from Kaggle
-        gen_df = pd.read_csv('Plant_1_Generation_Data.csv')
-        weather_df = pd.read_csv('Plant_1_Weather_Sensor_Data.csv')
+        df = process_data('Plant_1_Generation_Data.csv', 'Plant_1_Weather_Sensor_Data.csv')
     except FileNotFoundError:
-        print("Error: Dataset CSV files not found.")
-        print("Please download and extract them following the README instructions.")
+        print("Error: Dataset CSV files not found. Please check your file paths.")
         return
 
-    print("Merging datasets on timestamps...")
-    # Merge the generation data with the weather data based on the exact date and time
-    df = pd.merge(gen_df, weather_df, on='DATE_TIME', how='inner')
-
-    # Define our inputs (Features) and what we want to predict (Target)
-    # We are predicting DC Power based on the ambient heat, panel heat, and sunlight intensity.
-    X = df[['AMBIENT_TEMPERATURE', 'MODULE_TEMPERATURE', 'IRRADIATION']]
-    y = df['DC_POWER']
-
-    # Split the dataset: 80% for training the model, 20% for testing its accuracy
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    print(f"Data merged successfully! Training on {len(X_train)} time-series records...")
-    print("Training Random Forest Regressor (this may take a few seconds)...")
+    print(f"Data merged successfully! Training on {len(df)} time-series records...")
     
-    # Initialize and train the model
-    model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
-    model.fit(X_train, y_train)
+    # Train the model
+    model, X_test, y_test = train_model(df)
 
-    # Evaluate the model's accuracy on the unseen test data
-    test_predictions = model.predict(X_test)
-    mae = mean_absolute_error(y_test, test_predictions)
-    r2 = r2_score(y_test, test_predictions)
+    # Evaluate the model
+    mae, r2 = evaluate_model(model, X_test, y_test)
     
     print("\n--------------------------------------------------")
     print("                 MODEL PERFORMANCE                ")
@@ -53,15 +64,17 @@ def main():
     print(f"R-squared (Accuracy):      {r2:.4f}")
     print("*An R2 score close to 1.0 indicates highly accurate forecasting.*")
     
-    # Run a prediction on a specific row to demonstrate the model working
     print("\n--------------------------------------------------")
     print("             SAMPLE PREDICTION TEST               ")
     print("--------------------------------------------------")
     
-    # Take an arbitrary sample from the test set (e.g., index 150)
-    sample_index = 150
-    sample_conditions = X_test.iloc[[sample_index]]
-    actual_power = y_test.iloc[sample_index]
+    # Filter for daytime hours and run a prediction
+    daytime_conditions = X_test[X_test['IRRADIATION'] > 0.1]
+    daytime_results = y_test.loc[daytime_conditions.index]
+    
+    sample_index = 50
+    sample_conditions = daytime_conditions.iloc[[sample_index]]
+    actual_power = daytime_results.iloc[sample_index]
     
     predicted_power = model.predict(sample_conditions)[0]
     
