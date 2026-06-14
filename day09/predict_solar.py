@@ -16,6 +16,10 @@ def process_data(gen_file_path, weather_file_path):
     weather_df['DATE_TIME'] = pd.to_datetime(weather_df['DATE_TIME'])
 
     df = pd.merge(gen_df, weather_df, on='DATE_TIME', how='inner')
+    
+    # Export the first 100 rows for the TA to debug
+    df.head(100).to_csv('sample_merged_data.csv', index=False)
+    
     return df
 
 def train_model(df):
